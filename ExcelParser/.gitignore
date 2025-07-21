@@ -1,0 +1,23 @@
+# Rider
+.idea/
+*.sln.iml
+
+# .NET build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# User-specific files
+*.user
+*.suo
+
+# Visual Studio
+.vs/
+
+# macOS system files
+.DS_Store
+
+# Logs
+*.log
