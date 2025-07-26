@@ -11,7 +11,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddScoped<ExcelParserService>();
 builder.Services.AddDbContext<DatabaseContext>(options => 
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));;
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));;
 
 var app = builder.Build();
 
