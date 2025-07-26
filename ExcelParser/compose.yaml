@@ -1,0 +1,24 @@
+﻿services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5190:5190"
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=excelparser;Username=postgres;Password=postgres
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: excelparser
+    volumes:
+      - db_data:/var/lib/postgres
+      
+volumes:
+  db_data:
