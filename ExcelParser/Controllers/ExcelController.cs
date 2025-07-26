@@ -15,7 +15,7 @@ public class ExcelController : ControllerBase
         _excelParserService = excelParserService;
     }
 
-    [HttpPost("getListPerson")]
+    [HttpPost("createPersonList")]
     public IActionResult ListPerson(IFormFile file)
     {
         using var stream = file.OpenReadStream();
