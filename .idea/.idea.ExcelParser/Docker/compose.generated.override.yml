@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  excelparser:
+    build:
+      context: "/Users/alexanderleshchenko/Desktop/my_projects/ExcelParser"
+      dockerfile: "ExcelParser/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/ExcelParser.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "excelparser:dev"
+    ports: []
+    volumes:
+    - "/Users/alexanderleshchenko/Desktop/my_projects/ExcelParser/ExcelParser:/app:rw"
+    - "/Users/alexanderleshchenko/Desktop/my_projects/ExcelParser:/src:rw"
+    - "/Users/alexanderleshchenko/.nuget/packages:/root/.nuget/packages"
+    working_dir: "/app"
