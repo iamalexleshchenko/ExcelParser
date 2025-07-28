@@ -15,12 +15,14 @@ public class ExcelController : ControllerBase
     private readonly ExcelParserService _excelParserService;
     private readonly DatabaseContext _databaseContext;
     private readonly IMapper _mapper;
+    private readonly ILogger<ExcelController> _logger;
 
-    public ExcelController(DatabaseContext databaseContext, ExcelParserService excelParserService, IMapper mapper)
+    public ExcelController(DatabaseContext databaseContext, ExcelParserService excelParserService, IMapper mapper, ILogger<ExcelController> logger)
     {
         _excelParserService = excelParserService;
         _databaseContext = databaseContext;
         _mapper = mapper;
+        _logger = logger;
     }
 
     [HttpPost("createPersonList")]
@@ -36,9 +38,10 @@ public class ExcelController : ControllerBase
     {
         try
         {
+            _logger.LogInformation($"Загрузил файл {file.FileName}");
             await using var stream = file.OpenReadStream();
             var list = _excelParserService.Parse(stream);
-        
+           
             var entities = _mapper.Map<List<PersonEntity>>(list);
             
             await _databaseContext.People.AddRangeAsync(entities); 
@@ -47,8 +50,8 @@ public class ExcelController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            _logger.LogError(e, $"Ошибка при загрузке файла {file.FileName}");
+            return BadRequest();
         }
     }
     
