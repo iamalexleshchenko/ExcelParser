@@ -1,5 +1,6 @@
 using ExcelParser.Services;
 using ExcelParser.Database;
+using ExcelParser.MappingProfiles;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 
@@ -11,7 +12,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddScoped<ExcelParserService>();
 builder.Services.AddDbContext<DatabaseContext>(options => 
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));;
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
+builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 
 var app = builder.Build();
 
