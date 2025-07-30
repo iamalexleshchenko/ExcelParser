@@ -10,10 +10,12 @@ namespace ExcelParser.Controllers;
 public class PeopleController : ControllerBase
 {
     private readonly DatabaseContext _databaseContext;
+    private readonly ILogger<PeopleController> _logger;
         
-    public PeopleController(DatabaseContext database)
+    public PeopleController(DatabaseContext database, ILogger<PeopleController> logger)
     {
         _databaseContext = database;
+        _logger = logger;
     }
 
     [HttpGet("/getPersonList")]
@@ -21,13 +23,18 @@ public class PeopleController : ControllerBase
     {
         try
         {
+            _logger.LogInformation("Начало выполнения GET-запроса /getPersonList.");
+            
             var personList = await _databaseContext.People
                 .ToListAsync();
+            
+            _logger.LogInformation("Получен List<PersonEntity>, содержащий {Count} записей.", personList.Count);
+            
             return Ok(personList);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Ошибка получения List<PersonEntity> из базы данных.");
             throw;
         }
     }
@@ -37,14 +44,18 @@ public class PeopleController : ControllerBase
     {
         try
         {
+            _logger.LogInformation("Начало выполнения GET-запроса /getPersonListWithPagination.");
+            
             var listPersonEntity = await _databaseContext.People
                 .ToListAsync(limit, offset);
+            
+            _logger.LogInformation("Получен List<PersonEntity> ({Count} записей). Параметры пагинации: Limit = {Limit}, Offset = {Offset}.", listPersonEntity.Count, limit, offset);
             
             return Ok(listPersonEntity);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Ошибка получения List<PersonEntity> из базы данных.");
             throw;
         }
     }

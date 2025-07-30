@@ -28,9 +28,22 @@ public class ExcelController : ControllerBase
     [HttpPost("createPersonList")]
     public IActionResult ListPerson(IFormFile file)
     {
-        using var stream = file.OpenReadStream();
-        var list = _excelParserService.Parse(stream);
-        return Ok(list);
+        try
+        {
+            _logger.LogInformation("Передан {FileName} файл.", file.FileName);
+            
+            using var stream = file.OpenReadStream();
+            var list = _excelParserService.Parse(stream);
+            
+            _logger.LogInformation("Сформирован json-файл, содержащий в себе {Count} записей.", list.Count);
+            
+            return Ok(list);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Ошибка загрузки файла {FileName}.", file.FileName);
+            throw;
+        }
     }
     
     [HttpPost("uploadPersonList")]
@@ -38,7 +51,8 @@ public class ExcelController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"Загрузил файл {file.FileName}");
+            _logger.LogInformation("Загрузил файл {FileName}",  file.FileName);
+            
             await using var stream = file.OpenReadStream();
             var list = _excelParserService.Parse(stream);
            
@@ -46,11 +60,14 @@ public class ExcelController : ControllerBase
             
             await _databaseContext.People.AddRangeAsync(entities); 
             await _databaseContext.SaveChangesAsync();
+            
+            _logger.LogInformation("{Count} объектов сохранены в базу данных", entities.Count);
+            
             return Ok();
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Ошибка при загрузке файла {file.FileName}");
+            _logger.LogError(e, "Ошибка загрузки файла {FileName}.", file.FileName);
             return BadRequest();
         }
     }
@@ -60,9 +77,13 @@ public class ExcelController : ControllerBase
     {
         try
         {
+            _logger.LogInformation("Начало выполнения GET-запроса /getPersonExcel.");
+            
             var personList = await _databaseContext.People
                 .ToListAsync();
         
+            _logger.LogInformation("Получен List<PersonEntity>, содержащий {Count} объектов.", personList.Count);
+            
             var stream = new MemoryStream();
             using var package = new ExcelPackage(stream);
         
@@ -71,11 +92,14 @@ public class ExcelController : ControllerBase
         
             await package.SaveAsync();
             stream.Position = 0;
+            
+            _logger.LogInformation("Сформирован поток Excel-файла. Размер потока: {Length} байт.", stream.Length);
+            
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "person.xlsx");
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Ошибка создания Excel-файла.");
             throw;
         }
     }
