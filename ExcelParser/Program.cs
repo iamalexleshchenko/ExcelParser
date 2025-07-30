@@ -1,15 +1,23 @@
-using ExcelParser.Services;
-using ExcelParser.Database;
-using ExcelParser.MappingProfiles;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using Serilog;
+
+using ExcelParser.Services;
+using ExcelParser.Database;
+using ExcelParser.Logging;
+using ExcelParser.MappingProfiles;
+
+LoggingConfiguration.ConfigureSerilog();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 ExcelPackage.License.SetNonCommercialPersonal("Alexander Leshchenko");
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+
 builder.Services.AddScoped<ExcelParserService>();
 builder.Services.AddDbContext<DatabaseContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
